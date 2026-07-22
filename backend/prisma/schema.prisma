@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String     @id @default(uuid())
+  email             String     @unique
+  password          String
+  name              String?
+  phone             String?
+  plan              String     @default("FREE") // FREE or PRO
+  sentMessagesCount Int        @default(0)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  
+  sessions  WhatsAppSession[]
+  contacts  Contact[]
+  campaigns Campaign[]
+  messages  Message[]
+  blocklists Blocklist[]
+}
+
+model WhatsAppSession {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  status    String   @default("DISCONNECTED") // CONNECTED, DISCONNECTED
+  sessionData String? // For storing session tokens if needed later
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  campaigns Campaign[]
+}
+
+model Contact {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  name      String
+  phone     String
+  group     String?  // e.g., 'marketing-list', 'leads'
+  createdAt DateTime @default(now())
+}
+
+model Campaign {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+  whatsAppSessionId String?
+  whatsAppSession  WhatsAppSession? @relation(fields: [whatsAppSessionId], references: [id])
+  
+  name             String
+  message          String
+  mediaUrl         String?  // Optional path to the uploaded media file
+  status           String   @default("PENDING") // PENDING, RUNNING, PAUSED, SCHEDULED, COMPLETED, FAILED
+  targetGroup      String?  // Which group of contacts to send to
+  successfulCount  Int      @default(0)
+  failedCount      Int      @default(0)
+  
+  scheduledAt      DateTime?
+  batchSize        Int?     // Number of messages to send in a batch
+  batchDelayMinutes Int?    // Delay between batches
+  lastProcessedIndex Int    @default(0)
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Message {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  contactPhone String
+  direction   String   // INBOUND or OUTBOUND
+  content     String
+  timestamp   DateTime @default(now())
+}
+
+model Blocklist {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  phone       String
+  reason      String?
+  createdAt   DateTime @default(now())
+  
+  @@unique([userId, phone])
+}
