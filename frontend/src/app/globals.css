@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #F0F2F5; /* WhatsApp Web background */
+  --color-foreground: #111B21; /* WhatsApp text color */
+  --color-primary: #25D366;    /* WhatsApp Green */
+  --color-primary-dark: #128C7E; /* WhatsApp Teal */
+  --color-surface: #ffffff;
+  --color-border: #e5e7eb;
+  --color-muted: #667781;
+  --color-muted-bg: #f9fafb;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  min-height: 100vh;
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/* Custom utilities for WhatsApp look */
+.card {
+  @apply bg-white border border-gray-200 rounded-lg shadow-sm;
+}
+.input {
+  @apply w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-[#25D366] focus:border-[#25D366] text-sm;
+}
+.btn-primary {
+  @apply inline-flex justify-center items-center px-4 py-2 bg-[#25D366] text-white text-sm font-medium rounded-md hover:bg-[#128C7E] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#25D366] transition-colors;
+}
+.btn-secondary {
+  @apply inline-flex justify-center items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#25D366] transition-colors;
+}
+
+/* Landing page animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes slideUpFade {
+  0% { opacity: 0; transform: translateY(15px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+.animate-slide-up-1 {
+  animation: slideUpFade 0.5s ease-out forwards;
+}
+.animate-slide-up-2 {
+  animation: slideUpFade 0.5s ease-out 0.4s forwards;
+  opacity: 0;
+}
+.animate-slide-up-3 {
+  animation: slideUpFade 0.5s ease-out 0.8s forwards;
+  opacity: 0;
+}
