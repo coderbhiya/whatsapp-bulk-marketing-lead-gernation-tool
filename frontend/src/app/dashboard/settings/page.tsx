@@ -12,8 +12,12 @@ export default function SettingsPage() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     
+    // Safely parse the API URL (Next.js statically replaces process.env strings)
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const socketUrl = apiUrl.replace(/\/api$/, '');
+    
     // Create socket connection
-    const socket = io(process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:3001', {
+    const socket = io(socketUrl, {
       auth: { token }
     });
 
