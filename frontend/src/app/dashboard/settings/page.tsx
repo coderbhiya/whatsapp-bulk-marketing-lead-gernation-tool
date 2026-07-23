@@ -3,33 +3,47 @@
 import { useEffect, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Smartphone, CheckCircle, RefreshCcw, LogOut } from 'lucide-react';
+import { io } from 'socket.io-client';
 
 export default function SettingsPage() {
   const [status, setStatus] = useState<{ ready: boolean, qr: string }>({ ready: false, qr: '' });
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchStatus = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/status`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setStatus(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch WhatsApp status:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchStatus();
-    // Poll every 3 seconds
-    const interval = setInterval(fetchStatus, 3000);
-    return () => clearInterval(interval);
+    const token = localStorage.getItem('token');
+    
+    // Create socket connection
+    const socket = io(process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:3001', {
+      auth: { token }
+    });
+
+    socket.on('connect', () => {
+      console.log('Connected to socket server');
+    });
+
+    socket.on('status', (data) => {
+      setStatus(data);
+      setIsLoading(false);
+    });
+
+    socket.on('qr', (qr) => {
+      setStatus(prev => ({ ...prev, qr, ready: false }));
+      setIsLoading(false);
+    });
+
+    socket.on('ready', () => {
+      setStatus({ ready: true, qr: '' });
+      setIsLoading(false);
+    });
+
+    socket.on('disconnected', () => {
+      setStatus({ ready: false, qr: '' });
+      setIsLoading(false);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -40,7 +54,7 @@ export default function SettingsPage() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       setStatus({ ready: false, qr: '' });
-      fetchStatus();
+      setIsLoading(true);
     } catch (error) {
       console.error('Logout failed:', error);
     }

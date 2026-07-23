@@ -1,6 +1,9 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import http from 'http';
+import { Server as SocketIOServer } from 'socket.io';
+import jwt from 'jsonwebtoken';
 import { Client, LocalAuth } from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
 import multer from 'multer';
@@ -13,6 +16,46 @@ import whatsappRoutes from './routes/whatsapp';
 import inboxRoutes from './routes/inbox';
 
 const app = express();
+const server = http.createServer(app);
+const io = new SocketIOServer(server, {
+    cors: {
+        origin: '*', // In production, replace with your frontend URL
+        methods: ['GET', 'POST']
+    }
+});
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_jwt_key_change_me_in_prod';
+
+// Socket middleware for authentication
+io.use((socket, next) => {
+    const token = socket.handshake.auth?.token;
+    if (!token) return next(new Error('Authentication error: No token'));
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET) as any;
+        socket.data.user = decoded;
+        next();
+    } catch (err) {
+        next(new Error('Authentication error: Invalid token'));
+    }
+});
+
+io.on('connection', (socket) => {
+    const userId = socket.data.user.userId;
+    console.log(`[Socket] User ${userId} connected`);
+    socket.join(userId);
+
+    // Initialize WhatsApp client and send current status
+    waManager.initializeClient(userId);
+    socket.emit('status', {
+        ready: waManager.isReady(userId),
+        qr: waManager.getQrCode(userId)
+    });
+
+    socket.on('disconnect', () => {
+        console.log(`[Socket] User ${userId} disconnected`);
+    });
+});
+
 const port = process.env.PORT || 3001;
 
 // Setup static serving for uploads
@@ -99,6 +142,7 @@ class WhatsAppManager {
         client.on('qr', (qr) => {
             console.log(`[WhatsApp] QR RECEIVED for user ${userId}`);
             this.qrCodes.set(userId, qr);
+            io.to(userId).emit('qr', qr);
         });
 
         client.on('authenticated', () => {
@@ -110,6 +154,7 @@ class WhatsAppManager {
             this.readyStates.set(userId, false);
             this.qrCodes.delete(userId);
             this.initializing.set(userId, false);
+            io.to(userId).emit('status', { ready: false, qr: '' });
         });
 
         client.on('ready', () => {
@@ -117,6 +162,8 @@ class WhatsAppManager {
             this.readyStates.set(userId, true);
             this.qrCodes.delete(userId); // Clear QR code when ready
             this.initializing.set(userId, false);
+            io.to(userId).emit('ready', true);
+            io.to(userId).emit('status', { ready: true, qr: '' });
         });
 
         client.on('disconnected', (reason: any) => {
@@ -125,6 +172,8 @@ class WhatsAppManager {
             this.clients.delete(userId);
             this.qrCodes.delete(userId);
             this.initializing.set(userId, false);
+            io.to(userId).emit('disconnected', reason);
+            io.to(userId).emit('status', { ready: false, qr: '' });
         });
 
         // Handle Incoming Messages
@@ -215,7 +264,7 @@ export const waManager = new WhatsAppManager();
 import { runCampaign } from './services/campaignRunner';
 import prisma from './prisma';
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
     
     // Check for scheduled campaigns every minute
