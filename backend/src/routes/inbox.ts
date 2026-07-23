@@ -39,7 +39,7 @@ router.get('/:contactPhone', authenticateToken, async (req: AuthRequest, res) =>
         const userId = req.user?.userId;
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-        const { contactPhone } = req.params;
+        const contactPhone = req.params.contactPhone as string;
 
         const messages = await prisma.message.findMany({
             where: { userId, contactPhone },

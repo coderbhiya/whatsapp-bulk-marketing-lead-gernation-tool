@@ -21,7 +21,16 @@ export async function runCampaign(campaignId: string, userId: string) {
         });
     }
 
-    const contactsQuery = { userId, ...(campaign.targetGroup ? { group: campaign.targetGroup } : {}) };
+    // Handle targetGroup filter (supports comma-separated multiple groups e.g. "Group A, Group B")
+    let contactsQuery: any = { userId };
+    if (campaign.targetGroup) {
+        const groups = campaign.targetGroup.split(',').map(g => g.trim()).filter(Boolean);
+        if (groups.length === 1) {
+            contactsQuery.group = groups[0];
+        } else if (groups.length > 1) {
+            contactsQuery.group = { in: groups };
+        }
+    }
     const allContacts = await prisma.contact.findMany({ where: contactsQuery, orderBy: { id: 'asc' } });
     
     // Resume from where it left off

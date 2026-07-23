@@ -257,19 +257,48 @@ export default function CampaignsPage() {
                 <input required type="text" className="input" value={newCampaign.name} onChange={e => setNewCampaign({...newCampaign, name: e.target.value})} placeholder="Q3 Newsletter" disabled={isSaving} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Target Group</label>
-                <select 
-                  className="input" 
-                  value={newCampaign.targetGroup} 
-                  onChange={e => setNewCampaign({...newCampaign, targetGroup: e.target.value})}
-                  disabled={isSaving}
-                >
-                  <option value="">All Contacts (No Filter)</option>
-                  {uniqueGroups.map(group => (
-                    <option key={group} value={group}>{group}</option>
-                  ))}
-                </select>
-                <p className="text-xs text-gray-500 mt-1">Select a group or leave as "All Contacts".</p>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Target Groups</label>
+                <div className="border rounded-lg p-3 max-h-40 overflow-y-auto space-y-2 bg-gray-50/50">
+                  <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer font-medium border-b pb-2 mb-1">
+                    <input
+                      type="checkbox"
+                      checked={!newCampaign.targetGroup}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setNewCampaign({ ...newCampaign, targetGroup: '' });
+                        }
+                      }}
+                      className="rounded text-green-600 focus:ring-green-500"
+                      disabled={isSaving}
+                    />
+                    All Contacts (No Filter)
+                  </label>
+                  {uniqueGroups.map((group) => {
+                    const selectedGroups = newCampaign.targetGroup ? newCampaign.targetGroup.split(',').map(g => g.trim()) : [];
+                    const isChecked = selectedGroups.includes(group);
+                    return (
+                      <label key={group} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            let updated: string[];
+                            if (e.target.checked) {
+                              updated = [...selectedGroups, group];
+                            } else {
+                              updated = selectedGroups.filter(g => g !== group);
+                            }
+                            setNewCampaign({ ...newCampaign, targetGroup: updated.join(', ') });
+                          }}
+                          className="rounded text-green-600 focus:ring-green-500"
+                          disabled={isSaving}
+                        />
+                        {group}
+                      </label>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Select one or multiple groups, or choose "All Contacts".</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Message Content</label>
