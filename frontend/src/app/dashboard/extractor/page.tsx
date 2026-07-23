@@ -15,22 +15,31 @@ export default function ExtractorPage() {
   const [extractingId, setExtractingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+
   const fetchGroups = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/groups`, {
+      const res = await fetch(`${API_BASE}/whatsapp/groups`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (res.ok) {
+      const contentType = res.headers.get('content-type');
+      if (res.ok && contentType && contentType.includes('application/json')) {
         const data = await res.json();
         setGroups(data);
       } else {
-        const err = await res.json();
-        setError(err.error || 'Failed to fetch groups');
+        let errMessage = 'Failed to fetch groups';
+        if (contentType && contentType.includes('application/json')) {
+          const err = await res.json();
+          errMessage = err.error || errMessage;
+        } else {
+          errMessage = `Server error (${res.status}). Ensure backend is running.`;
+        }
+        setError(errMessage);
       }
     } catch (err) {
       console.error('Failed to fetch groups:', err);
-      setError('Connection error');
+      setError('Connection error. Could not connect to backend API.');
     } finally {
       setIsLoading(false);
     }
@@ -44,16 +53,23 @@ export default function ExtractorPage() {
     setExtractingId(groupId);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/groups/${groupId}/extract`, {
+      const res = await fetch(`${API_BASE}/whatsapp/groups/${groupId}/extract`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (res.ok) {
+      const contentType = res.headers.get('content-type');
+      if (res.ok && contentType && contentType.includes('application/json')) {
         const data = await res.json();
         alert(`Successfully extracted ${data.extracted} new contacts from ${groupName}!`);
       } else {
-        const errData = await res.json();
-        alert(errData.error || 'Failed to extract contacts');
+        let errMessage = 'Failed to extract contacts';
+        if (contentType && contentType.includes('application/json')) {
+          const errData = await res.json();
+          errMessage = errData.error || errMessage;
+        } else {
+          errMessage = `Server error (${res.status}).`;
+        }
+        alert(errMessage);
       }
     } catch (error) {
       console.error('Failed to extract:', error);
