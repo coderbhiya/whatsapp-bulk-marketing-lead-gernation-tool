@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Users, Zap, BarChart3, Activity } from 'lucide-react';
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<{name: string, email: string} | null>(null);
+  const [user, setUser] = useState<{ name: string, email: string } | null>(null);
   const [stats, setStats] = useState({ totalContacts: 0, activeCampaigns: 0 });
 
   useEffect(() => {
@@ -17,16 +17,16 @@ export default function DashboardPage() {
       try {
         const token = localStorage.getItem('token');
         const headers = { 'Authorization': `Bearer ${token}` };
-        
+
         const [contactsRes, campaignsRes] = await Promise.all([
-          fetch('http://localhost:3001/api/contacts', { headers }),
-          fetch('http://localhost:3001/api/campaigns', { headers })
+          fetch('https://apibulkping.senseforge.in/api/contacts', { headers }),
+          fetch('https://apibulkping.senseforge.in/api/campaigns', { headers })
         ]);
 
         if (contactsRes.ok && campaignsRes.ok) {
           const contacts = await contactsRes.json();
           const campaigns = await campaignsRes.json();
-          
+
           const activeCampaigns = campaigns.filter((c: any) => c.status === 'RUNNING' || c.status === 'PENDING').length;
 
           setStats({

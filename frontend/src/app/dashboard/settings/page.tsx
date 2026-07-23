@@ -5,13 +5,13 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Smartphone, CheckCircle, RefreshCcw, LogOut } from 'lucide-react';
 
 export default function SettingsPage() {
-  const [status, setStatus] = useState<{ready: boolean, qr: string}>({ ready: false, qr: '' });
+  const [status, setStatus] = useState<{ ready: boolean, qr: string }>({ ready: false, qr: '' });
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchStatus = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3001/api/whatsapp/status', {
+      const res = await fetch('https://apibulkping.senseforge.in/api/whatsapp/status', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -35,7 +35,7 @@ export default function SettingsPage() {
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem('token');
-      await fetch('http://localhost:3001/api/whatsapp/logout', {
+      await fetch('https://apibulkping.senseforge.in/api/whatsapp/logout', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -82,8 +82,8 @@ export default function SettingsPage() {
           <div className="flex flex-col items-center justify-center py-8 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
             <h3 className="text-md font-medium text-gray-900 mb-2">Scan QR Code to Connect</h3>
             <p className="text-sm text-gray-500 text-center max-w-sm mb-6">
-              1. Open WhatsApp on your phone<br/>
-              2. Tap Menu or Settings and select Linked Devices<br/>
+              1. Open WhatsApp on your phone<br />
+              2. Tap Menu or Settings and select Linked Devices<br />
               3. Tap on Link a Device and point your phone to this screen
             </p>
             <div className="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-4">
@@ -94,8 +94,8 @@ export default function SettingsPage() {
                 <RefreshCcw className="w-4 h-4 animate-spin text-[#25D366]" />
                 Waiting for connection...
               </div>
-              <button 
-                onClick={handleLogout} 
+              <button
+                onClick={handleLogout}
                 className="text-xs text-gray-500 hover:text-red-600 underline transition-colors"
               >
                 Reset & Regenerate QR
@@ -107,8 +107,8 @@ export default function SettingsPage() {
             <RefreshCcw className="w-6 h-6 animate-spin text-gray-400" />
             <p className="text-sm font-medium">Initializing WhatsApp Client...</p>
             <p className="text-xs text-gray-400">Please wait, generating QR code.</p>
-            <button 
-              onClick={handleLogout} 
+            <button
+              onClick={handleLogout}
               className="mt-2 text-xs text-gray-500 hover:text-red-600 underline transition-colors"
             >
               Cancel & Restart Client

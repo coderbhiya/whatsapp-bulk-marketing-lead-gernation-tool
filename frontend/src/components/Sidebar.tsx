@@ -14,7 +14,7 @@ export default function Sidebar() {
     try {
       const token = localStorage.getItem('token');
       if (token) {
-        await fetch('http://localhost:3001/api/whatsapp/logout', {
+        await fetch('https://apibulkping.senseforge.in/api/whatsapp/logout', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -57,8 +57,8 @@ export default function Sidebar() {
               key={item.path}
               href={item.path}
               className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
-                  ? 'bg-green-50 text-green-700'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                ? 'bg-green-50 text-green-700'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                 }`}
             >
               <Icon className={`w-5 h-5 ${isActive ? 'text-green-700' : 'text-gray-400'}`} />

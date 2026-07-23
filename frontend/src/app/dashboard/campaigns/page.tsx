@@ -32,11 +32,11 @@ export default function CampaignsPage() {
     try {
       const token = localStorage.getItem('token');
       const headers = { 'Authorization': `Bearer ${token}` };
-      
+
       const [campaignsRes, contactsRes, userRes] = await Promise.all([
-        fetch('http://localhost:3001/api/campaigns', { headers }),
-        fetch('http://localhost:3001/api/contacts', { headers }),
-        fetch('http://localhost:3001/api/auth/me', { headers })
+        fetch('https://apibulkping.senseforge.in/api/campaigns', { headers }),
+        fetch('https://apibulkping.senseforge.in/api/contacts', { headers }),
+        fetch('https://apibulkping.senseforge.in/api/auth/me', { headers })
       ]);
 
       if (campaignsRes.ok) setCampaigns(await campaignsRes.json());
@@ -62,7 +62,7 @@ export default function CampaignsPage() {
   const handleRunCampaign = async (id: string) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3001/api/campaigns/${id}/run`, {
+      const res = await fetch(`https://apibulkping.senseforge.in/api/campaigns/${id}/run`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -93,8 +93,8 @@ export default function CampaignsPage() {
       if (selectedFile) {
         const formData = new FormData();
         formData.append('file', selectedFile);
-        
-        const uploadRes = await fetch('http://localhost:3001/api/upload', {
+
+        const uploadRes = await fetch('https://apibulkping.senseforge.in/api/upload', {
           method: 'POST',
           body: formData,
         });
@@ -109,10 +109,10 @@ export default function CampaignsPage() {
         }
       }
 
-      const url = editingCampaignId 
-        ? `http://localhost:3001/api/campaigns/${editingCampaignId}`
-        : 'http://localhost:3001/api/campaigns';
-        
+      const url = editingCampaignId
+        ? `https://apibulkping.senseforge.in/api/campaigns/${editingCampaignId}`
+        : 'https://apibulkping.senseforge.in/api/campaigns';
+
       const payload = {
         ...newCampaign,
         mediaUrl: finalMediaUrl || undefined
@@ -120,7 +120,7 @@ export default function CampaignsPage() {
 
       const res = await fetch(url, {
         method: editingCampaignId ? 'PUT' : 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
@@ -142,9 +142,9 @@ export default function CampaignsPage() {
   };
 
   const handleEditClick = (campaign: Campaign) => {
-    setNewCampaign({ 
-      name: campaign.name, 
-      targetGroup: campaign.targetGroup || '', 
+    setNewCampaign({
+      name: campaign.name,
+      targetGroup: campaign.targetGroup || '',
       message: campaign.message,
       mediaUrl: campaign.mediaUrl || ''
     });
@@ -157,7 +157,7 @@ export default function CampaignsPage() {
     if (!window.confirm('Are you sure you want to delete this campaign?')) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3001/api/campaigns/${id}`, {
+      const res = await fetch(`https://apibulkping.senseforge.in/api/campaigns/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -206,26 +206,24 @@ export default function CampaignsPage() {
 
       {/* Free Plan Message Limit Banner */}
       {isFreePlan && (
-        <div className={`p-4 rounded-xl border flex items-center justify-between gap-4 shadow-sm ${
-          isLimitReached 
-            ? 'bg-amber-500/10 border-amber-500/30 text-amber-900' 
+        <div className={`p-4 rounded-xl border flex items-center justify-between gap-4 shadow-sm ${isLimitReached
+            ? 'bg-amber-500/10 border-amber-500/30 text-amber-900'
             : 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 text-green-900'
-        }`}>
+          }`}>
           <div className="flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-              isLimitReached ? 'bg-amber-500 text-white' : 'bg-[#25D366] text-white'
-            }`}>
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${isLimitReached ? 'bg-amber-500 text-white' : 'bg-[#25D366] text-white'
+              }`}>
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
               <p className="text-sm font-bold">
-                {isLimitReached 
-                  ? 'Free Message Limit Reached (5/5 Messages Sent)' 
+                {isLimitReached
+                  ? 'Free Message Limit Reached (5/5 Messages Sent)'
                   : `Free Plan Quota: ${sentCount} of 5 free messages used`}
               </p>
               <p className="text-xs text-gray-600 mt-0.5">
-                {isLimitReached 
-                  ? 'Upgrade to PRO Plan for ₹99 to send unlimited bulk messages & campaigns.' 
+                {isLimitReached
+                  ? 'Upgrade to PRO Plan for ₹99 to send unlimited bulk messages & campaigns.'
                   : `You have ${5 - sentCount} free messages left. Upgrade to PRO for unlimited messages.`}
               </p>
             </div>
@@ -254,7 +252,7 @@ export default function CampaignsPage() {
             <form onSubmit={handleSaveCampaign} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Campaign Name</label>
-                <input required type="text" className="input" value={newCampaign.name} onChange={e => setNewCampaign({...newCampaign, name: e.target.value})} placeholder="Q3 Newsletter" disabled={isSaving} />
+                <input required type="text" className="input" value={newCampaign.name} onChange={e => setNewCampaign({ ...newCampaign, name: e.target.value })} placeholder="Q3 Newsletter" disabled={isSaving} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Target Groups</label>
@@ -302,15 +300,15 @@ export default function CampaignsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Message Content</label>
-                <textarea required className="input min-h-[100px]" value={newCampaign.message} onChange={e => setNewCampaign({...newCampaign, message: e.target.value})} placeholder="Hello {{name}}! We have a special offer for you..." disabled={isSaving}></textarea>
+                <textarea required className="input min-h-[100px]" value={newCampaign.message} onChange={e => setNewCampaign({ ...newCampaign, message: e.target.value })} placeholder="Hello {{name}}! We have a special offer for you..." disabled={isSaving}></textarea>
                 <p className="text-xs text-gray-500 mt-1">Use <code>{`{{name}}`}</code> to personalize the message.</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
                   <ImageIcon className="w-4 h-4" /> Media Attachment (Optional)
                 </label>
-                <input 
-                  type="file" 
+                <input
+                  type="file"
                   accept="image/*,video/*"
                   onChange={handleFileChange}
                   className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 transition-colors"
@@ -356,20 +354,19 @@ export default function CampaignsPage() {
                     {camp.mediaUrl && <span title="Has media attachment"><ImageIcon className="w-4 h-4 text-green-500" /></span>}
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2.5 py-1 rounded-md text-xs font-medium border ${
-                      camp.status === 'COMPLETED' ? 'bg-green-50 text-green-700 border-green-200' : 
-                      camp.status === 'RUNNING' ? 'bg-blue-50 text-blue-700 border-blue-200' : 
-                      camp.status === 'FAILED' ? 'bg-red-50 text-red-700 border-red-200' :
-                      'bg-yellow-50 text-yellow-700 border-yellow-200'
-                    }`}>
+                    <span className={`px-2.5 py-1 rounded-md text-xs font-medium border ${camp.status === 'COMPLETED' ? 'bg-green-50 text-green-700 border-green-200' :
+                        camp.status === 'RUNNING' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                          camp.status === 'FAILED' ? 'bg-red-50 text-red-700 border-red-200' :
+                            'bg-yellow-50 text-yellow-700 border-yellow-200'
+                      }`}>
                       {camp.status}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     {(camp.successfulCount > 0 || camp.failedCount > 0 || camp.status === 'COMPLETED' || camp.status === 'FAILED') ? (
                       <div className="flex gap-3 text-xs">
-                        <span className="flex items-center gap-1 text-green-600"><CheckCircle className="w-3 h-3"/> {camp.successfulCount}</span>
-                        <span className="flex items-center gap-1 text-red-600"><XCircle className="w-3 h-3"/> {camp.failedCount}</span>
+                        <span className="flex items-center gap-1 text-green-600"><CheckCircle className="w-3 h-3" /> {camp.successfulCount}</span>
+                        <span className="flex items-center gap-1 text-red-600"><XCircle className="w-3 h-3" /> {camp.failedCount}</span>
                       </div>
                     ) : (
                       <span className="text-gray-400">-</span>

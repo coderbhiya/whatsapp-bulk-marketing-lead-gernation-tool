@@ -18,7 +18,7 @@ export default function ExtractorPage() {
   const fetchGroups = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3001/api/whatsapp/groups', {
+      const res = await fetch('https://apibulkping.senseforge.in/api/whatsapp/groups', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -44,7 +44,7 @@ export default function ExtractorPage() {
     setExtractingId(groupId);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3001/api/whatsapp/groups/${groupId}/extract`, {
+      const res = await fetch(`https://apibulkping.senseforge.in/api/whatsapp/groups/${groupId}/extract`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -116,8 +116,8 @@ export default function ExtractorPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button 
-                      onClick={() => handleExtract(group.id, group.name)} 
+                    <button
+                      onClick={() => handleExtract(group.id, group.name)}
                       disabled={extractingId === group.id}
                       className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 border border-green-200 rounded-md hover:bg-green-100 hover:border-green-300 font-medium text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >

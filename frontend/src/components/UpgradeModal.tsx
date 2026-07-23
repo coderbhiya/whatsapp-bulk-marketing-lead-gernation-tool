@@ -40,7 +40,7 @@ export default function UpgradeModal({ isOpen, onClose, onSuccess }: UpgradeModa
       }
 
       const token = localStorage.getItem('token');
-      const orderRes = await fetch('http://localhost:3001/api/payment/create-order', {
+      const orderRes = await fetch('https://apibulkping.senseforge.in/api/payment/create-order', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -57,11 +57,11 @@ export default function UpgradeModal({ isOpen, onClose, onSuccess }: UpgradeModa
 
       // If in mock/test mode without real Razorpay keys, activate PRO plan instantly
       if (orderData.isMock) {
-        const verifyRes = await fetch('http://localhost:3001/api/payment/verify', {
+        const verifyRes = await fetch('https://apibulkping.senseforge.in/api/payment/verify', {
           method: 'POST',
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({ isMock: true })
         });
@@ -93,11 +93,11 @@ export default function UpgradeModal({ isOpen, onClose, onSuccess }: UpgradeModa
         order_id: orderData.orderId,
         handler: async function (response: any) {
           try {
-            const verifyRes = await fetch('http://localhost:3001/api/payment/verify', {
+            const verifyRes = await fetch('https://apibulkping.senseforge.in/api/payment/verify', {
               method: 'POST',
-              headers: { 
+              headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` 
+                'Authorization': `Bearer ${token}`
               },
               body: JSON.stringify({
                 razorpay_order_id: response.razorpay_order_id,
@@ -156,21 +156,21 @@ export default function UpgradeModal({ isOpen, onClose, onSuccess }: UpgradeModa
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden relative border border-gray-100">
-        
+
         {/* Header Banner */}
         <div className="bg-gradient-to-r from-[#111B21] via-[#128C7E] to-[#25D366] p-6 text-white relative">
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/20 hover:bg-black/40 flex items-center justify-center text-white transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
-          
+
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold text-white mb-3">
             <Crown className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" />
             Special Upgrade Offer
           </div>
-          
+
           <h2 className="text-2xl font-bold">Upgrade to BulkPing PRO</h2>
           <p className="text-white/80 text-sm mt-1">Unlock unlimited bulk messaging and scale your WhatsApp CRM.</p>
         </div>

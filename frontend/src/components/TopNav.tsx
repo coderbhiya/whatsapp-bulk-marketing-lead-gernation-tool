@@ -14,7 +14,7 @@ export default function TopNav() {
     try {
       const token = localStorage.getItem('token');
       if (token) {
-        const res = await fetch('http://localhost:3001/api/auth/me', {
+        const res = await fetch('https://apibulkping.senseforge.in/api/auth/me', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -23,7 +23,7 @@ export default function TopNav() {
           localStorage.setItem('user', JSON.stringify(data));
         }
       }
-    } catch (e) {}
+    } catch (e) { }
   };
 
   useEffect(() => {

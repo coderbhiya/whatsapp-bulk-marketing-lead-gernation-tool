@@ -18,7 +18,7 @@ export default function RegisterPage() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:3001/api/auth/register', {
+      const res = await fetch('https://apibulkping.senseforge.in/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, phone, password }),
@@ -32,7 +32,7 @@ export default function RegisterPage() {
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      
+
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message);
@@ -47,7 +47,7 @@ export default function RegisterPage() {
         </div>
         <h2 className="mb-2 text-xl font-semibold text-gray-900">Create an account</h2>
         <p className="mb-6 text-gray-500 text-sm">Join the CRM platform today.</p>
-        
+
         {error && (
           <div className="mb-6 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-600">
             {error}
@@ -80,7 +80,7 @@ export default function RegisterPage() {
               required
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="phone">Mobile Number</label>
             <div className="flex">
@@ -110,7 +110,7 @@ export default function RegisterPage() {
               required
             />
           </div>
-          
+
           <button type="submit" className="btn-primary w-full mt-2">
             Sign up
           </button>

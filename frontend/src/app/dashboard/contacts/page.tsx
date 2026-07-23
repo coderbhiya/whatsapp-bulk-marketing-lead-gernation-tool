@@ -22,7 +22,7 @@ export default function ContactsPage() {
   const fetchContacts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3001/api/contacts', {
+      const res = await fetch('https://apibulkping.senseforge.in/api/contacts', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -44,13 +44,13 @@ export default function ContactsPage() {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const url = editingContactId 
-        ? `http://localhost:3001/api/contacts/${editingContactId}`
-        : 'http://localhost:3001/api/contacts';
-      
+      const url = editingContactId
+        ? `https://apibulkping.senseforge.in/api/contacts/${editingContactId}`
+        : 'https://apibulkping.senseforge.in/api/contacts';
+
       const res = await fetch(url, {
         method: editingContactId ? 'PUT' : 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
@@ -75,7 +75,7 @@ export default function ContactsPage() {
     if (!window.confirm('Are you sure you want to delete this contact?')) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3001/api/contacts/${id}`, {
+      const res = await fetch(`https://apibulkping.senseforge.in/api/contacts/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -101,18 +101,18 @@ export default function ContactsPage() {
     reader.onload = async (event) => {
       const text = event.target?.result as string;
       if (!text) return;
-      
+
       const rows = text.split('\n').map(row => row.trim()).filter(row => row);
       if (rows.length < 2) {
         alert('CSV must contain headers and at least one contact.');
         return;
       }
-      
+
       const headers = rows[0].toLowerCase().split(',').map(h => h.trim());
       const nameIdx = headers.indexOf('name');
       const phoneIdx = headers.indexOf('phone');
       const groupIdx = headers.indexOf('group');
-      
+
       if (nameIdx === -1 || phoneIdx === -1) {
         alert('CSV must contain "name" and "phone" columns.');
         return;
@@ -129,15 +129,15 @@ export default function ContactsPage() {
 
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:3001/api/contacts/bulk', {
+        const res = await fetch('https://apibulkping.senseforge.in/api/contacts/bulk', {
           method: 'POST',
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({ contacts: bulkContacts })
         });
-        
+
         if (res.ok) {
           const data = await res.json();
           alert(`Successfully imported ${data.count} contacts!`);
@@ -149,7 +149,7 @@ export default function ContactsPage() {
         console.error('Bulk import error:', error);
         alert('Error importing contacts.');
       }
-      
+
       // Reset input so you can select the same file again if needed
       if (fileInputRef.current) fileInputRef.current.value = '';
     };
@@ -167,15 +167,15 @@ export default function ContactsPage() {
           <a href="/sample_contacts.csv" download className="text-xs text-green-600 hover:underline mr-2">
             Sample CSV
           </a>
-          <input 
-            type="file" 
-            accept=".csv" 
-            ref={fileInputRef} 
-            onChange={handleFileUpload} 
-            className="hidden" 
+          <input
+            type="file"
+            accept=".csv"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            className="hidden"
           />
-          <button 
-            onClick={() => fileInputRef.current?.click()} 
+          <button
+            onClick={() => fileInputRef.current?.click()}
             className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition-colors flex items-center gap-2"
           >
             <Upload className="w-4 h-4" />
@@ -202,15 +202,15 @@ export default function ContactsPage() {
             <form onSubmit={handleSaveContact} className="space-y-4 mt-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                <input required type="text" className="input" value={newContact.name} onChange={e => setNewContact({...newContact, name: e.target.value})} placeholder="John Doe" />
+                <input required type="text" className="input" value={newContact.name} onChange={e => setNewContact({ ...newContact, name: e.target.value })} placeholder="John Doe" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                <input required type="text" className="input" value={newContact.phone} onChange={e => setNewContact({...newContact, phone: e.target.value})} placeholder="+1234567890" />
+                <input required type="text" className="input" value={newContact.phone} onChange={e => setNewContact({ ...newContact, phone: e.target.value })} placeholder="+1234567890" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Group (Optional)</label>
-                <input type="text" className="input" value={newContact.group} onChange={e => setNewContact({...newContact, group: e.target.value})} placeholder="VIP Customers" />
+                <input type="text" className="input" value={newContact.group} onChange={e => setNewContact({ ...newContact, group: e.target.value })} placeholder="VIP Customers" />
               </div>
               <button type="submit" className="btn-primary w-full mt-4">
                 {editingContactId ? 'Save Changes' : 'Save Single Contact'}
@@ -224,9 +224,9 @@ export default function ContactsPage() {
         <div className="p-4 border-b border-gray-100 flex gap-4 bg-white items-center">
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-            <input 
-              type="text" 
-              placeholder="Search contacts..." 
+            <input
+              type="text"
+              placeholder="Search contacts..."
               className="pl-9 pr-4 py-1.5 w-full bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-all"
             />
           </div>
@@ -237,7 +237,7 @@ export default function ContactsPage() {
             </select>
           </div>
         </div>
-        
+
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="bg-gray-50/50 border-b border-gray-200 text-gray-500">

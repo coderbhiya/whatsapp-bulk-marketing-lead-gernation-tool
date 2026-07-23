@@ -16,7 +16,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:3001/api/auth/login', {
+      const res = await fetch('https://apibulkping.senseforge.in/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -30,7 +30,7 @@ export default function LoginPage() {
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      
+
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message);
@@ -45,7 +45,7 @@ export default function LoginPage() {
         </div>
         <h2 className="mb-2 text-xl font-semibold text-gray-900">Login to your account</h2>
         <p className="mb-6 text-gray-500 text-sm">Welcome back! Please enter your details.</p>
-        
+
         {error && (
           <div className="mb-6 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-600">
             {error}
@@ -65,7 +65,7 @@ export default function LoginPage() {
               required
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="password">Password</label>
             <input
@@ -78,7 +78,7 @@ export default function LoginPage() {
               required
             />
           </div>
-          
+
           <button type="submit" className="btn-primary w-full mt-2">
             Sign in
           </button>
