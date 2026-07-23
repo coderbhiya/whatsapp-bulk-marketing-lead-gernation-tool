@@ -22,7 +22,7 @@ export default function ContactsPage() {
   const fetchContacts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('https://apibulkping.senseforge.in/api/contacts', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/contacts`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -45,8 +45,8 @@ export default function ContactsPage() {
     try {
       const token = localStorage.getItem('token');
       const url = editingContactId
-        ? `https://apibulkping.senseforge.in/api/contacts/${editingContactId}`
-        : 'https://apibulkping.senseforge.in/api/contacts';
+        ? `${process.env.NEXT_PUBLIC_API_URL}/contacts/${editingContactId}`
+        : `${process.env.NEXT_PUBLIC_API_URL}/contacts`;
 
       const res = await fetch(url, {
         method: editingContactId ? 'PUT' : 'POST',
@@ -75,7 +75,7 @@ export default function ContactsPage() {
     if (!window.confirm('Are you sure you want to delete this contact?')) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`https://apibulkping.senseforge.in/api/contacts/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/contacts/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -129,7 +129,7 @@ export default function ContactsPage() {
 
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('https://apibulkping.senseforge.in/api/contacts/bulk', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/contacts/bulk`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

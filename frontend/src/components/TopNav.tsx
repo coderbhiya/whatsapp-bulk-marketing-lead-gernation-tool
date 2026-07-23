@@ -14,7 +14,7 @@ export default function TopNav() {
     try {
       const token = localStorage.getItem('token');
       if (token) {
-        const res = await fetch('https://apibulkping.senseforge.in/api/auth/me', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {

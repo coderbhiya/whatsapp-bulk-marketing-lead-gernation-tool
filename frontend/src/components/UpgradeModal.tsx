@@ -40,7 +40,7 @@ export default function UpgradeModal({ isOpen, onClose, onSuccess }: UpgradeModa
       }
 
       const token = localStorage.getItem('token');
-      const orderRes = await fetch('https://apibulkping.senseforge.in/api/payment/create-order', {
+      const orderRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payment/create-order`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -57,7 +57,7 @@ export default function UpgradeModal({ isOpen, onClose, onSuccess }: UpgradeModa
 
       // If in mock/test mode without real Razorpay keys, activate PRO plan instantly
       if (orderData.isMock) {
-        const verifyRes = await fetch('https://apibulkping.senseforge.in/api/payment/verify', {
+        const verifyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payment/verify`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ export default function UpgradeModal({ isOpen, onClose, onSuccess }: UpgradeModa
         order_id: orderData.orderId,
         handler: async function (response: any) {
           try {
-            const verifyRes = await fetch('https://apibulkping.senseforge.in/api/payment/verify', {
+            const verifyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payment/verify`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

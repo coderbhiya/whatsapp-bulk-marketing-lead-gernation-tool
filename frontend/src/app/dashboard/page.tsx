@@ -19,8 +19,8 @@ export default function DashboardPage() {
         const headers = { 'Authorization': `Bearer ${token}` };
 
         const [contactsRes, campaignsRes] = await Promise.all([
-          fetch('https://apibulkping.senseforge.in/api/contacts', { headers }),
-          fetch('https://apibulkping.senseforge.in/api/campaigns', { headers })
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/contacts`, { headers }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/campaigns`, { headers })
         ]);
 
         if (contactsRes.ok && campaignsRes.ok) {

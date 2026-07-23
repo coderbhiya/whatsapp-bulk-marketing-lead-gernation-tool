@@ -14,7 +14,7 @@ export default function Sidebar() {
     try {
       const token = localStorage.getItem('token');
       if (token) {
-        await fetch('https://apibulkping.senseforge.in/api/whatsapp/logout', {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/logout`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`

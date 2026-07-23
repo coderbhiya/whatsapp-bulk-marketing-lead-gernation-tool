@@ -34,9 +34,9 @@ export default function CampaignsPage() {
       const headers = { 'Authorization': `Bearer ${token}` };
 
       const [campaignsRes, contactsRes, userRes] = await Promise.all([
-        fetch('https://apibulkping.senseforge.in/api/campaigns', { headers }),
-        fetch('https://apibulkping.senseforge.in/api/contacts', { headers }),
-        fetch('https://apibulkping.senseforge.in/api/auth/me', { headers })
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/campaigns`, { headers }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/contacts`, { headers }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, { headers })
       ]);
 
       if (campaignsRes.ok) setCampaigns(await campaignsRes.json());
@@ -62,7 +62,7 @@ export default function CampaignsPage() {
   const handleRunCampaign = async (id: string) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`https://apibulkping.senseforge.in/api/campaigns/${id}/run`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/campaigns/${id}/run`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -94,7 +94,7 @@ export default function CampaignsPage() {
         const formData = new FormData();
         formData.append('file', selectedFile);
 
-        const uploadRes = await fetch('https://apibulkping.senseforge.in/api/upload', {
+        const uploadRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
           method: 'POST',
           body: formData,
         });
@@ -110,8 +110,8 @@ export default function CampaignsPage() {
       }
 
       const url = editingCampaignId
-        ? `https://apibulkping.senseforge.in/api/campaigns/${editingCampaignId}`
-        : 'https://apibulkping.senseforge.in/api/campaigns';
+        ? `${process.env.NEXT_PUBLIC_API_URL}/campaigns/${editingCampaignId}`
+        : `${process.env.NEXT_PUBLIC_API_URL}/campaigns`;
 
       const payload = {
         ...newCampaign,
@@ -157,7 +157,7 @@ export default function CampaignsPage() {
     if (!window.confirm('Are you sure you want to delete this campaign?')) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`https://apibulkping.senseforge.in/api/campaigns/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/campaigns/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

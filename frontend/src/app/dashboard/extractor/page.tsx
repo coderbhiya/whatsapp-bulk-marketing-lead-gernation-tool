@@ -18,7 +18,7 @@ export default function ExtractorPage() {
   const fetchGroups = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('https://apibulkping.senseforge.in/api/whatsapp/groups', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/groups`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -44,7 +44,7 @@ export default function ExtractorPage() {
     setExtractingId(groupId);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`https://apibulkping.senseforge.in/api/whatsapp/groups/${groupId}/extract`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/groups/${groupId}/extract`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });

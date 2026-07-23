@@ -86,7 +86,7 @@ npx prisma generate
 # Start Backend Server
 npm run dev
 ```
-Backend will start on `http://localhost:3001`.
+Backend will start on `https://apibulkping.senseforge.in`.
 
 ---
 

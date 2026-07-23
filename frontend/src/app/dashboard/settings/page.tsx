@@ -11,7 +11,7 @@ export default function SettingsPage() {
   const fetchStatus = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('https://apibulkping.senseforge.in/api/whatsapp/status', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/status`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -35,7 +35,7 @@ export default function SettingsPage() {
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem('token');
-      await fetch('https://apibulkping.senseforge.in/api/whatsapp/logout', {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/logout`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
