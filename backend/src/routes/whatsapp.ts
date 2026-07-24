@@ -127,20 +127,57 @@ router.post('/groups/:id/extract', authenticateToken, async (req: AuthRequest, r
         let participantsList: { phoneId: string, name: string }[] = [];
         let groupName = 'Extracted Group';
 
+        // Fallback or Primary: Try native whatsapp-web.js GroupChat fetching first/as robust fallback
+        try {
+            const chat = await client.getChatById(groupId);
+            if (chat && chat.isGroup) {
+                groupName = chat.name || groupName;
+                const groupChat = chat as any;
+                
+                // Fetch group participants
+                let participants = groupChat.participants || [];
+                if ((!participants || participants.length === 0) && groupChat.groupMetadata?.participants) {
+                    participants = groupChat.groupMetadata.participants;
+                }
+
+                if (participants && participants.length > 0) {
+                    for (const p of participants) {
+                        const phoneId = typeof p.id === 'object' ? p.id._serialized : p.id;
+                        if (!phoneId) continue;
+                        let name = phoneId.split('@')[0];
+                        try {
+                            const contact = await client.getContactById(phoneId);
+                            name = contact.name || contact.pushname || contact.shortName || name;
+                        } catch (e) {}
+                        participantsList.push({ phoneId, name });
+                    }
+                }
+            }
+        } catch (e) {
+            console.log('Native getChatById failed, trying puppeteer evaluate fallback...', e);
+        }
+
         const pupPage = (client as any).pupPage;
-        if (pupPage) {
+
+        // Puppeteer evaluation fallback if native method returned empty
+        if (participantsList.length === 0 && pupPage) {
             try {
                 const rawData = await pupPage.evaluate(async (gid: string) => {
                     try {
-                        const ChatCollection = window.require('WAWebCollections').Chat;
-                        const target = ChatCollection.get(gid);
+                        const win = window as any;
+                        const ChatCollection = win.require ? win.require('WAWebCollections').Chat : null;
+                        let target = ChatCollection ? ChatCollection.get(gid) : null;
+                        if (!target && win.Store?.Chat) {
+                            target = win.Store.Chat.get(gid);
+                        }
                         if (!target) return null;
+
                         const parts = target.groupMetadata?.participants || target.participants || [];
                         const list = [];
                         for (const p of parts) {
-                            const pid = typeof p.id === 'object' ? p.id._serialized : p.id;
-                            const pName = p.name || p.contact?.name || p.contact?.pushname || pid.split('@')[0];
-                            list.push({ phoneId: pid, name: pName });
+                            const pid = typeof p.id === 'object' ? (p.id._serialized || p.id.user + '@c.us') : p.id;
+                            const pName = p.name || p.contact?.name || p.contact?.pushname || (pid ? pid.split('@')[0] : 'Contact');
+                            if (pid) list.push({ phoneId: pid, name: pName });
                         }
                         return { name: target.name || target.formattedTitle || 'Extracted Group', participants: list };
                     } catch (e) {
@@ -148,33 +185,15 @@ router.post('/groups/:id/extract', authenticateToken, async (req: AuthRequest, r
                     }
                 }, groupId);
 
-                if (rawData) {
-                    groupName = rawData.name;
-                    participantsList = rawData.participants || [];
+                if (rawData && rawData.participants && rawData.participants.length > 0) {
+                    groupName = rawData.name || groupName;
+                    participantsList = rawData.participants;
                 }
             } catch (e) {}
         }
 
         if (participantsList.length === 0) {
-            try {
-                const chat = await client.getChatById(groupId);
-                if (chat && chat.isGroup && (chat as any).participants) {
-                    groupName = chat.name || groupName;
-                    for (const p of (chat as any).participants) {
-                        const phoneId = p.id._serialized;
-                        let name = phoneId.split('@')[0];
-                        try {
-                            const contact = await client.getContactById(phoneId);
-                            name = contact.name || contact.pushname || name;
-                        } catch (e) {}
-                        participantsList.push({ phoneId, name });
-                    }
-                }
-            } catch (e) {}
-        }
-
-        if (participantsList.length === 0) {
-            return res.status(400).json({ error: 'Could not fetch group participants' });
+            return res.status(400).json({ error: 'Could not fetch group participants. Please ensure WhatsApp is active and connected.' });
         }
 
         let addedCount = 0;
