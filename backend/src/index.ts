@@ -127,6 +127,7 @@ class WhatsAppManager {
             authStrategy: new LocalAuth({ dataPath: `./.wwebjs_auth/${userId}` }),
             puppeteer: {
                 headless: true,
+                executablePath: '/usr/bin/chromium-browser',
                 args: [
                     '--no-sandbox',
                     '--disable-setuid-sandbox',
@@ -180,10 +181,10 @@ class WhatsAppManager {
         client.on('message', async (msg) => {
             try {
                 if (msg.from === 'status@broadcast') return;
-                
+
                 const contactPhone = msg.from;
                 const content = msg.body;
-                
+
                 // 1. Save to Shared Inbox
                 await prisma.message.create({
                     data: {
@@ -193,7 +194,7 @@ class WhatsAppManager {
                         content
                     }
                 });
-                
+
                 // 2. Opt-out handling
                 const lowerContent = content.toLowerCase().trim();
                 if (lowerContent === 'stop' || lowerContent === 'unsubscribe') {
@@ -202,22 +203,22 @@ class WhatsAppManager {
                         update: { reason: 'User opt-out via message' },
                         create: { userId, phone: contactPhone, reason: 'User opt-out via message' }
                     });
-                    
+
                     await client.sendMessage(contactPhone, 'You have been successfully unsubscribed and will not receive further messages.');
                     return;
                 }
-                
+
                 // 3. Basic Auto-responder (can be expanded later)
                 if (lowerContent === 'price' || lowerContent === 'pricing') {
                     const reply = 'Here is our pricing information: \n\n1. Basic: $9/mo\n2. Pro: $29/mo\n\nReply with STOP to unsubscribe.';
                     await client.sendMessage(contactPhone, reply);
-                    
+
                     // Save outbound message to inbox
                     await prisma.message.create({
                         data: { userId, contactPhone, direction: 'OUTBOUND', content: reply }
                     });
                 }
-                
+
             } catch (error) {
                 console.error('Error handling incoming message:', error);
             }
@@ -231,8 +232,8 @@ class WhatsAppManager {
         const client = this.clients.get(userId);
         if (client) {
             try {
-                await client.logout().catch(() => {});
-                await client.destroy().catch(() => {});
+                await client.logout().catch(() => { });
+                await client.destroy().catch(() => { });
             } catch (error) {
                 console.error(`Error destroying client for user ${userId}:`, error);
             }
@@ -266,7 +267,7 @@ import prisma from './prisma';
 
 server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
-    
+
     // Check for scheduled campaigns every minute
     setInterval(async () => {
         try {
@@ -277,7 +278,7 @@ server.listen(port, () => {
                     scheduledAt: { lte: now }
                 }
             });
-            
+
             for (const campaign of scheduledCampaigns) {
                 console.log(`Starting scheduled campaign ${campaign.id}`);
                 runCampaign(campaign.id, campaign.userId).catch(console.error);
